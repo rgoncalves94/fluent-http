@@ -1,0 +1,28 @@
+{
+    "authors": [
+        {
+            "name": "Rafael Henrique Ap. Gonçalves", 
+            "email": "rafael.goncalves19@fatec.sp.gov.br"
+        }
+    ],
+    "name": "rgoncalves94/fluent-http",
+    "license": "MIT",
+    "type": "project",
+    "description": "This is a fluent implementation of CUrl function to create http requests easily. Also use it to configure your API endpoints and easily call then.",
+    "keywords": ["micro-framework", "curl"],
+    "require-dev": {
+        "fzaninotto/faker": "~1.4",
+        "mockery/mockery": "0.9.*",
+        "phpunit/phpunit": "~5.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "FluentHttp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\FluentHttp\\": "tests/"
+        }
+    }
+}

@@ -8,11 +8,11 @@ class DefaultHeader implements Header
 
     public function getHeader()
     {
-        return [
+        return array(
             'Content-Type' => 'application/json',
             'Charset' => 'utf-8',
             'Accept' => 'application/json',
-        ];
+        );
     }
 
 }
