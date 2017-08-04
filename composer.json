@@ -10,9 +10,6 @@
     "type": "project",
     "description": "This is a fluent implementation of CUrl function to create http requests easily. Also use it to configure your API endpoints and easily call then.",
     "keywords": ["micro-framework", "curl"],
-    "require-dev": {
-        "phpunit/phpunit": "~5.7"
-    },
     "autoload": {
         "psr-4": {
             "FluentHttp\\": "src/"
