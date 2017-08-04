@@ -5,6 +5,7 @@ namespace Tests\FluentHttp;
 use PHPUnit\Framework\TestCase;
 use FluentHttp\Http;
 use FluentHttp\Headers\HeaderFactory;
+use Tests\FluentHttp\TestUrls;
 use ReflectionClass;
 
 /**
@@ -13,13 +14,9 @@ use ReflectionClass;
 final class GetMethodTest extends TestCase
 {
 
-    const XML_URL = "http://localhost/tests/data/xml.php";
-    const JSON_URL = "http://localhost/tests/data/json.php";
-    const HTML_URL = "http://localhost/tests/data/html.php";
-
     public function testGETMethodQueryStringCreation()
     {
-        $http = Http::create()->get(self::JSON_URL, array(
+        $http = Http::create()->get(TestUrls::JSON_URL, array(
             "hi" => "bye",
             "its" => "working"
         ));
@@ -32,13 +29,13 @@ final class GetMethodTest extends TestCase
 
         $this->assertEquals(
             $result,
-            self::JSON_URL . "?hi=bye&its=working"
+            TestUrls::JSON_URL . "?hi=bye&its=working"
         );
     }
 
     public function testGETMethodQueryStringCreationMultidimensionalArray()
     {
-        $http = Http::create()->get(self::JSON_URL, array(
+        $http = Http::create()->get(TestUrls::JSON_URL, array(
             "hi" => "bye",
             "more" => array("than" => "words")
         ));
@@ -51,13 +48,13 @@ final class GetMethodTest extends TestCase
 
         $this->assertEquals(
             $result,
-            self::JSON_URL . "?hi=bye&more%5Bthan%5D=words"
+            TestUrls::JSON_URL . "?hi=bye&more%5Bthan%5D=words"
         );
     }
 
     public function testGETMethodQueryStringCreationWithParamSeparator()
     {
-        $http = Http::create()->get(self::JSON_URL . '?', array(
+        $http = Http::create()->get(TestUrls::JSON_URL . '?', array(
             "hi" => "bye",
             "more" => array("than" => "words")
         ));
@@ -70,13 +67,13 @@ final class GetMethodTest extends TestCase
 
         $this->assertEquals(
             $result,
-            self::JSON_URL . "?hi=bye&more%5Bthan%5D=words"
+            TestUrls::JSON_URL . "?hi=bye&more%5Bthan%5D=words"
         );
     }
 
     public function testGETMethodQueryStringCreationWithExistingParameters()
     {
-        $http = Http::create()->get(self::JSON_URL . '?here=has+a+parameter&', array(
+        $http = Http::create()->get(TestUrls::JSON_URL . '?here=has+a+parameter&', array(
             "hi" => "bye",
             "more" => array("than" => "words")
         ));
@@ -89,13 +86,13 @@ final class GetMethodTest extends TestCase
 
         $this->assertEquals(
             $result,
-            self::JSON_URL . "?here=has+a+parameter&hi=bye&more%5Bthan%5D=words"
+            TestUrls::JSON_URL . "?here=has+a+parameter&hi=bye&more%5Bthan%5D=words"
         );
     }
 
     public function testGETMethodWithoutParameter()
     {
-        $http = Http::create()->get(self::JSON_URL);
+        $http = Http::create()->get(TestUrls::JSON_URL);
 
         $rc = new ReflectionClass($http);
 
@@ -105,13 +102,13 @@ final class GetMethodTest extends TestCase
 
         $this->assertEquals(
             $result,
-            self::JSON_URL
+            TestUrls::JSON_URL
         );
     }
 
     public function testGetMethodReceivingRawResponse()
     {
-        $rawResponse = Http::create()->get(self::JSON_URL)->raw();
+        $rawResponse = Http::create()->get(TestUrls::JSON_URL)->raw();
 
         $this->assertNotEmpty($rawResponse);
         $this->assertJsonStringEqualsJsonString(json_encode(
@@ -124,19 +121,21 @@ final class GetMethodTest extends TestCase
 
     public function testGetMethodReceivingParsedResponse()
     {
-        $response = Http::create()->get(self::JSON_URL)->run();
+        $response = Http::create()->get(TestUrls::JSON_URL)->run();
 
         $this->assertNotEmpty($response);
-        $this->assertEquals(array(
-                "status" => true,
-                "message" => "It's a json endpoint"
-        ), $response);
+        $this->assertEquals(json_decode('{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}', true), $response);
     }
 
     public function testGetMethodReceivingParsedResponseWhenSubscribe()
     {
         $response = Http::create()
-            ->get(self::JSON_URL)
+            ->get(TestUrls::JSON_URL)
             ->subscribe(function($json, $http) {
                 return compact('json', 'http');
             });

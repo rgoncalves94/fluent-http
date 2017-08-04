@@ -13,24 +13,21 @@ use ReflectionClass;
 final class SubscribeTest extends TestCase
 {
 
-    const XML_URL = "http://localhost/tests/data/xml.php";
-    const JSON_URL = "http://localhost/tests/data/json.php";
-    const HTML_URL = "http://localhost/tests/data/html.php";
-
     public function testReceivingDataParameter()
     {
         $response = Http::create()
-            ->get(self::JSON_URL)
+            ->get(TestUrls::JSON_URL)
             ->subscribe(function($data) {
                 return $data;
             });
-
-        $this->assertJsonStringEqualsJsonString(json_encode(
-            array(
-                "status" => true, 
-                "message" => "It's a json endpoint"
-            )
-        ), $response);
+            
+        $this->assertJsonStringEqualsJsonString('{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}', 
+$response);
     }
     
     /**
@@ -40,7 +37,7 @@ final class SubscribeTest extends TestCase
     {
         $http = Http::create();
         $response = $http
-            ->get(self::JSON_URL)
+            ->get(TestUrls::JSON_URL)
             ->subscribe(function($data, $http) {
                 return compact('data', 'http');
             });
@@ -57,7 +54,7 @@ final class SubscribeTest extends TestCase
     {
         $http = Http::create();
         $response = $http
-            ->get(self::JSON_URL)
+            ->get(TestUrls::JSON_URL)
             ->subscribe(function($json, $data, $http) {
                 return compact('data', 'http', 'json');
             });
@@ -79,7 +76,7 @@ final class SubscribeTest extends TestCase
     {
         $http = Http::create();
         $response = $http
-            ->get(self::XML_URL)
+            ->get(TestUrls::XML_URL)
             ->subscribe(function($data, $http, $xml) {
                 return compact('data', 'http', 'xml');
             });

@@ -285,7 +285,7 @@ class Http
         curl_setopt($ch,CURLOPT_URL, $url); 
         
         curl_setopt($ch,CURLOPT_HTTPHEADER, $this->headers->getHeader()); 
-        curl_setopt($ch,CURLOPT_TIMEOUT, 60); 
+        //curl_setopt($ch,CURLOPT_TIMEOUT, 60); 
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 
         //curl_setopt($ch,CURLOPT_MAXREDIRS, $this->_maxRedirects); 
@@ -320,6 +320,13 @@ class Http
             $behavior($ch, $data);
 
         $rawResponse = curl_exec($ch);
+
+        try {
+            if (FALSE === $rawResponse)
+                throw new \Exception(curl_error($ch), curl_errno($ch));
+        } catch(\Exception $e) {
+            trigger_error(sprintf('Curl failed with error #%d: %s',$e->getCode(), $e->getMessage()));
+        }
 
         curl_close($ch);
 
