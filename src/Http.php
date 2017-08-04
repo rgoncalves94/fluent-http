@@ -7,6 +7,9 @@ use FluentHttp\Headers\DefaultHeader;
 use FluentHttp\Method;
 use Closure;
 use RuntimeException;
+use FluentHttp\Exceptions\InvalidHttpMethodException;
+use FluentHttp\Exceptions\InvalidUrlException;
+use ReflectionFunction;
 
 /**
 * Facade to do http requests
@@ -51,8 +54,8 @@ class Http
      */
     public static function create(Header $headers = null)
     {
-        if(empty($header))
-            $header = new DefaultHeader();
+        if(empty($headers))
+            $headers = new DefaultHeader();
 
         return new Http($headers);
     }
@@ -91,7 +94,7 @@ class Http
             if(!preg_match('/\?/', $url)) {
                 $queryStr = '?' . $queryStr;
             } else if(!preg_match('/\?$/', $url)) {
-                if(preg_match('/\&/', $url)) {
+                if(!preg_match('/\&/', $url)) {
                     $queryStr = "&" . $queryStr;
                 }
             }
@@ -179,9 +182,51 @@ class Http
      */
     public function subscribe(Closure $fn)
     {
-        $this->parsedResponse = $fn($this->raw());
+        $rawResponse = $this->raw();
 
-        return $this;
+        $rf = new ReflectionFunction($fn);
+
+        $parameters = $rf->getParameters();
+
+        $definedParameters = array();
+        foreach($parameters as $parameter) {
+            //getName | getDefaultValue | getType | getPosition
+            switch($parameter->getName()) {
+                case "data": 
+                    $definedParameters['data'] = $rawResponse;
+                    break;
+                case "http": 
+                    $definedParameters['http'] = $this;
+                    break;
+                case "json": 
+                    $definedParameters['json'] = json_decode($rawResponse, 1);
+                    break;
+                case "xml": 
+                    $definedParameters['xml'] = json_decode(json_encode(simplexml_load_string($rawResponse)), 1);
+                    break;
+                default:
+                    throw new InvalidHttpClosureArgumentException(
+                        sprintf(
+                            "The '\$%s' argument isn't mapped, use any of: %s", 
+                            $parameter->getName(),
+                            implode(",", array('data', 'http', 'json', 'xml'))
+                        )
+                    );
+            }
+        }
+
+        extract($definedParameters);
+
+        $keys = array_keys($definedParameters);
+
+        $params = implode(',', array_map(function($item) {
+            return "$" . $item;
+        }, $keys));
+
+        $this->parsedResponse = eval("return \$fn($params);");
+
+        return $this->parsedResponse;
+        //return $this;
     }
 
     /**
@@ -189,7 +234,7 @@ class Http
      *
      * @return mixed
      */
-    public function send()
+    public function run()
     {
         $rawResponse = $this->raw();
 
@@ -225,14 +270,21 @@ class Http
      */
     protected function doRequest($url, $method = Method::METHOD_GET, $data = array(), Closure $behavior = null)
     {
-        if($this->isValidMethod())
-            
+        if(!$this->isValidMethod($method))
+            throw new InvalidHttpMethodException(
+                sprintf("Invalid HTTP Method: '%s'", $method)
+            );
+        
+        if(!$this->isValidUrl($url))
+            throw new InvalidUrlException(
+                sprintf("Invalid URL Method: '%s'", $url)
+            );
 
         $ch = curl_init();
         
         curl_setopt($ch,CURLOPT_URL, $url); 
         
-           curl_setopt($ch,CURLOPT_HTTPHEADER, $this->headers->getHeaders()); 
+        curl_setopt($ch,CURLOPT_HTTPHEADER, $this->headers->getHeader()); 
         curl_setopt($ch,CURLOPT_TIMEOUT, 60); 
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 
