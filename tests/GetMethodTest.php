@@ -13,9 +13,9 @@ use ReflectionClass;
 final class GetMethodTest extends TestCase
 {
 
-    const XML_URL = "http://localhost:3000/tests/data/xml.php";
-    const JSON_URL = "http://localhost:3000/tests/data/json.php";
-    const HTML_URL = "http://localhost:3000/tests/data/html.php";
+    const XML_URL = "http://localhost/tests/data/xml.php";
+    const JSON_URL = "http://localhost/tests/data/json.php";
+    const HTML_URL = "http://localhost/tests/data/html.php";
 
     public function testGETMethodQueryStringCreation()
     {
