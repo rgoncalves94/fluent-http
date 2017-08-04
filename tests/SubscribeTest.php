@@ -8,7 +8,7 @@ use FluentHttp\Headers\HeaderFactory;
 use ReflectionClass;
 
 /**
- * @covers FluentHttp\Http;
+ * @covers FluentHttp\Http
  */
 final class SubscribeTest extends TestCase
 {

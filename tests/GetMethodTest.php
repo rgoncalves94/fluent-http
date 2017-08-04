@@ -9,7 +9,7 @@ use Tests\FluentHttp\TestUrls;
 use ReflectionClass;
 
 /**
- * @covers FluentHttp\Http;
+ * @covers FluentHttp\Http
  */
 final class GetMethodTest extends TestCase
 {
