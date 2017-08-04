@@ -8,7 +8,7 @@ use FluentHttp\Headers\HeaderFactory;
 use ReflectionClass;
 
 /**
- * @covers Http
+ * @covers FluentHttp\Http;
  */
 final class SubscribeTest extends TestCase
 {
@@ -20,7 +20,7 @@ final class SubscribeTest extends TestCase
             ->subscribe(function($data) {
                 return $data;
             });
-            
+
         $this->assertJsonStringEqualsJsonString('{
   "userId": 1,
   "id": 1,
